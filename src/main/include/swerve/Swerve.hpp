@@ -21,9 +21,10 @@ using namespace ctre::phoenix::motorcontrol::can;
 class Swerve : frc2::SubsystemBase
 {
     public:
-        bool field_centred = false;
+        bool field_centered = false;
         Swerve(float length, float width);
         void drive(float x, float y, float z, float gyro);
+        bool toggle_field_centricity(); // returns changed state
     private:
         wheel_info math_dest;
         struct size_constants chassis_info;
@@ -35,17 +36,17 @@ class Swerve : frc2::SubsystemBase
         // feast upon this awesome code!!
         WPI_TalonFX DRIVE_MOTORS[4] = 
         {
-            (FR_M),
-            (FL_M),
-            (RL_M),
-            (RR_M)
+            {FR_M},
+            {FL_M},
+            {RL_M},
+            {RR_M}
         };
         WPI_TalonFX ANGLE_MOTORS[4] = 
         {
-            (FR_A),
-            (FL_A),
-            (RL_A),
-            (RR_A)
+            {FR_A},
+            {FL_A},
+            {RL_A},
+            {RR_A}
         };
 };
 

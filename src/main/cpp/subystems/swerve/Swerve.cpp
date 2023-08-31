@@ -12,18 +12,23 @@ Swerve::Swerve(float length, float width)
 void Swerve::drive(float x, float y, float z, float gyro)
 {
     /* Generate our math and store in dest struct to be converted / used */
-    calculate_wheel_information(&this->math_dest,this->chassis_info,x,y,z,this->field_centred,gyro);
+    calculate_wheel_information(&this->math_dest,this->chassis_info,x,y,z,this->field_centered,gyro);
     
-    /* Wheel speeds are normalised to 0-1 percent anyways. No need for conversion promise! */
+    /* Move our swerve based on calculations */
     int i;
     for(i = 0; i < 4; i++)
     {
         this->DRIVE_MOTORS[i].Set(ctre::phoenix::motorcontrol::ControlMode::PercentOutput, this->math_dest.wheel_speeds[i]);
     }
     
-    /* Normalise wheel angles by 180 (this probably won't work lol but maybe just maybe)*/
     for(i = 0; i < 4; i++)
     {
-        this->ANGLE_MOTORS->Set(ctre::phoenix::motorcontrol::ControlMode::PercentOutput, this->math_dest.wheel_angle[i]/180);
+        this->ANGLE_MOTORS->Set(ctre::phoenix::motorcontrol::ControlMode::Position, this->math_dest.wheel_angle[i]);
     }
+}
+
+bool Swerve::toggle_field_centricity()
+{
+    this->field_centered = !this->field_centered;
+    return this->field_centered;
 }
