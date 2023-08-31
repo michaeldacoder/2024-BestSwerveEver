@@ -31,7 +31,7 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-  DRIVE.drive(Jostick.GetY(), Jostick.GetX(), Jostick.GetRawAxis(5), 0);
+  DRIVE.drive(Jostick.GetY(), Jostick.GetX(), Jostick.GetRawAxis(4)-Jostick.GetRawAxis(5), 0);
 }
 
 void Robot::DisabledInit() {}
