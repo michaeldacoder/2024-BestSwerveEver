@@ -14,7 +14,7 @@ struct wheel_information
 	/* 2 = rear left,   3 = rear right       */
 
 	float wheel_speeds[4]; 
-	float wheel_angle[4];
+	int wheel_angle[4];
 };
 
 typedef struct wheel_information wheel_info;

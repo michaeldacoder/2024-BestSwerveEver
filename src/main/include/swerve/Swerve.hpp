@@ -24,6 +24,7 @@ class Swerve : frc2::SubsystemBase
         bool field_centered = false;
         Swerve(float length, float width);
         void drive(float x, float y, float z, float gyro);
+        void print_swerve_math(wheel_info math);
         bool toggle_field_centricity(); // returns changed state
     private:
         wheel_info math_dest;
