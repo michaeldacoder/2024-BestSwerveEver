@@ -5,6 +5,8 @@
 #include "Robot.h"
 #include "swerve/swerve_math.h"
 #include "swerve/Swerve.hpp"
+#include <math.h>
+#include <iostream>
 
 #include <fmt/core.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -31,7 +33,12 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-  DRIVE.drive(Jostick.GetY(), Jostick.GetX(), Jostick.GetRawAxis(4)-Jostick.GetRawAxis(5), 0);
+  float y = Jostick.GetY();
+  float x = Jostick.GetX();
+
+
+
+  DRIVE.drive(y, x, 0);
 }
 
 void Robot::DisabledInit() {}

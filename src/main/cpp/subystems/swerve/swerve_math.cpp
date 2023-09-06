@@ -1,5 +1,6 @@
 #include "../../../include/swerve/swerve_math.h"
 #include <math.h>
+#include <iostream>
 
 /* Written by Zane Maples, 7/31/23 */
 /* Meant to be used with a 4 wheel */
@@ -12,6 +13,8 @@ void calculate_wheel_information(wheel_info *dest, struct size_constants cons, f
 {
 	float forward = fwd;
 	float strafe = str;
+
+	std::cout << strafe << "\n";
 
 	if(field_centric)
 	{
@@ -57,10 +60,13 @@ void calculate_wheel_information(wheel_info *dest, struct size_constants cons, f
 		for(i = 0; i < 4; i++) { dest->wheel_speeds[i] = wheel_speeds[i] / max; }
 	}
 
-	dest->wheel_angle[0] = atan2f(B,C) * MAGIC_NUMBER;
-	dest->wheel_angle[1] = atan2f(B,D) * MAGIC_NUMBER;
-	dest->wheel_angle[2] = atan2f(A,D) * MAGIC_NUMBER;
-	dest->wheel_angle[3] = atan2f(A,C) * MAGIC_NUMBER;
-	
+	/* Don't reset our swerve values. Head current heading! */
+	if(1/*str != 0 && fwd != 0*/)
+	{
+		dest->wheel_angle[0] = atan2f(B,C) * MAGIC_NUMBER;
+		dest->wheel_angle[1] = atan2f(B,D) * MAGIC_NUMBER;
+		dest->wheel_angle[2] = atan2f(A,D) * MAGIC_NUMBER;
+		dest->wheel_angle[3] = atan2f(A,C) * MAGIC_NUMBER;
+	}
 	return;
 }
