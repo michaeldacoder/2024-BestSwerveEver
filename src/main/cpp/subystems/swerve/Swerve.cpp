@@ -2,10 +2,19 @@
 #include <iostream>
 #include <math.h>
 
+#define F_PI 3.14159f
+
 Swerve::Swerve(float length, float width)
 {
     this->chassis_info.length = length;
     this->chassis_info.width = width;
+    for(int i = 0; i < 4; i++)
+    {
+        /* Zero out our angle matrix initially */
+        this->angle_matrix[i][0] = 0;
+        this->angle_matrix[i][1] = 0;
+        this->angle_matrix[i][2] = 0;
+    }
 };
 
 void Swerve::print_swerve_math(wheel_info math)
@@ -18,12 +27,10 @@ void Swerve::print_swerve_math(wheel_info math)
     }
 }
 
-/* NOTE: do NOT reverse the fwd (x) polarity! It should be negative! */
 /* When field centric mode is disabled 'gyro' is ignored             */
 
-void Swerve::drive(float y, float x, float gyro)
+void Swerve::drive(float y, float x, float x2, float gyro)
 {
-    bool x_deadzone;
     bool y_deadzone;
     bool y_move_abs;
 
@@ -41,34 +48,47 @@ void Swerve::drive(float y, float x, float gyro)
             /* Sets so that the true forward value is used incase of no strafing. Horrible hack but it works. */
             y_move_abs = true;
         }
-        x_deadzone = true;
     } 
-
-    float z = 0;
-
-    /* Generate our math and store in dest struct to be converted / used */
-    calculate_wheel_information(&this->math_dest,this->chassis_info,y,x,z,this->field_centered,gyro);
-    print_swerve_math(this->math_dest);
-
-    /* If idle just return and DO NOT feed the motors 
-    TODO: this needs to be tested. could potentially just constantly move motors if not properly cleaned */
-    if(y_deadzone && x_deadzone)
+    if(x2 < DEADZONE_THRES && x2 > -DEADZONE_THRES)
     {
-        return;
+        x2 = 0;
     }
 
-    /* Move our swerve based on calculations, then flush data */
+    /* Generate our math and store in dest struct to be converted / used */
+    calculate_wheel_information(&this->math_dest,this->chassis_info,y,x,x2,this->field_centered,gyro);
+
     int i;
 
-    /* Fixes our issues of forward / backward with no speed */
+    /* Allows for forward movement even when X is in deadzone */
     if(y_move_abs)
     {
         for(i = 0; i < 4; i++)
         {
-            this->math_dest.wheel_speeds[i] = y;
-            std::cout << "foward ";
+            this->math_dest.wheel_speeds[i] = abs(y);
         }
     }
+
+    print_swerve_math(this->math_dest);
+
+    /* Make our angles workable, taken from last year. Seems to work! */
+    for(i = 0; i < 4; i++)
+    {
+        if(abs(this->angle_matrix[i][0] - this->math_dest.wheel_angle[i]) > F_PI && this->angle_matrix[i][0] < this->math_dest.wheel_angle[i])
+        {
+            this->angle_matrix[i][1] -= 2 * F_PI;
+        }
+        if(abs(this->angle_matrix[i][0] - this->math_dest.wheel_angle[i]) > F_PI && this->angle_matrix[i][0] > this->math_dest.wheel_angle[i])
+        {
+            this->angle_matrix[i][1] += 2 * F_PI;
+        }
+
+        /* Save new angle as previous */
+        this->angle_matrix[i][0] = this->math_dest.wheel_angle[i];
+
+        this->angle_matrix[i][2] = -(this->math_dest.wheel_angle[i] + this->angle_matrix[i][1] / (F_PI * 2) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION);
+    }
+
+    /* Only run our motors once everything is calculated */
 
     for(i = 0; i < 4; i++)
     {
@@ -78,10 +98,9 @@ void Swerve::drive(float y, float x, float gyro)
     
     for(i = 0; i < 4; i++)
     {
-        this->ANGLE_MOTORS->Set(ctre::phoenix::motorcontrol::ControlMode::Position, this->math_dest.wheel_angle[i]);
+        this->ANGLE_MOTORS->Set(ctre::phoenix::motorcontrol::ControlMode::Position, this->angle_matrix[i][2]);
     }
 
-    x_deadzone = false;
     y_deadzone = false;
     y_move_abs = false;
 }

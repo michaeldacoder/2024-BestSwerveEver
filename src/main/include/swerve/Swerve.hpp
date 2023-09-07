@@ -13,7 +13,9 @@
 #define RR_A 8
 
 /* Swerve Constants */
-#define DEADZONE_THRES .005
+#define DEADZONE_THRES .05 // Adjust this value higher to combat crappy shitty horrible controllers 
+#define SWERVE_GEAR_RATIO 8.14
+#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 2048
 
 #include <frc2/command/SubsystemBase.h>
 #include "swerve_math.h"
@@ -26,7 +28,7 @@ class Swerve : frc2::SubsystemBase
     public:
         bool field_centered = false;
         Swerve(float length, float width);
-        void drive(float x, float y, float gyro);
+        void drive(float x, float y, float x2, float gyro);
         void print_swerve_math(wheel_info math);
         bool toggle_field_centricity(); // returns changed state
     private:
@@ -52,6 +54,10 @@ class Swerve : frc2::SubsystemBase
             {RL_A},
             {RR_A}
         };
+
+        /* Stores previous angles and offset */
+        /* Prev Angle, Offset, Raw usable */
+        float angle_matrix[4][3];
 };
 
 #endif
