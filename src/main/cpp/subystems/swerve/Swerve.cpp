@@ -13,7 +13,12 @@ Swerve::Swerve(float length, float width)
         /* Zero out our angle matrix initially */
         this->angle_matrix[i][0] = 0;
         this->angle_matrix[i][1] = 0;
-        this->angle_matrix[i][2] = 0;
+        this->raw_usable_matrix[i] = 0;
+
+        /* Config our angle motors using PID system */
+        this->ANGLE_MOTORS[i].Config_kP(0, SWERVE_P);
+        this->ANGLE_MOTORS[i].Config_kI(1, SWERVE_I);
+        this->ANGLE_MOTORS[i].Config_kD(2, SWERVE_D);
     }
 };
 
@@ -85,7 +90,7 @@ void Swerve::drive(float y, float x, float x2, float gyro)
         /* Save new angle as previous */
         this->angle_matrix[i][0] = this->math_dest.wheel_angle[i];
 
-        this->angle_matrix[i][2] = -(this->math_dest.wheel_angle[i] + this->angle_matrix[i][1] / (F_PI * 2) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION);
+        this->raw_usable_matrix[i] = -((this->math_dest.wheel_angle[i] + this->angle_matrix[i][1] / (F_PI * 2)) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION);
     }
 
     /* Only run our motors once everything is calculated */
@@ -98,14 +103,13 @@ void Swerve::drive(float y, float x, float x2, float gyro)
     
     for(i = 0; i < 4; i++)
     {
-        this->ANGLE_MOTORS->Set(ctre::phoenix::motorcontrol::ControlMode::Position, this->angle_matrix[i][2]);
+        this->ANGLE_MOTORS[i].Set(ctre::phoenix::motorcontrol::ControlMode::Position, this->raw_usable_matrix[i]);
+        this->raw_usable_matrix[i] = 0;
     }
 
     y_deadzone = false;
     y_move_abs = false;
 }
-
-
 
 bool Swerve::toggle_field_centricity()
 {

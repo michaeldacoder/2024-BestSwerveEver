@@ -14,8 +14,11 @@
 
 /* Swerve Constants */
 #define DEADZONE_THRES .05 // Adjust this value higher to combat crappy shitty horrible controllers 
-#define SWERVE_GEAR_RATIO 8.14
+#define SWERVE_GEAR_RATIO 8.14 // Physical gear ratio for the motors
 #define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 2048
+#define SWERVE_P .2245
+#define SWERVE_I .0000185
+#define SWERVE_D .000003
 
 #include <frc2/command/SubsystemBase.h>
 #include "swerve_math.h"
@@ -28,12 +31,19 @@ class Swerve : frc2::SubsystemBase
     public:
         bool field_centered = false;
         Swerve(float length, float width);
-        void drive(float x, float y, float x2, float gyro);
-        void print_swerve_math(wheel_info math);
+        void drive(float x, float y, float x2, float gyro); // gyro is ignored when field_centered is false
+        void print_swerve_math(wheel_info math); // debug
         bool toggle_field_centricity(); // returns changed state
     private:
         wheel_info math_dest;
+
+        /* Width and Height */
         struct size_constants chassis_info;
+
+        /* Stores previous angles and offset */
+        /* Prev Angle, Offset, Raw usable */
+        float angle_matrix[4][2];
+        int raw_usable_matrix[4];
 
         /* Motor bank. Follows the format in the math_dest 
             0 = front right, 1 = front left 
@@ -54,10 +64,6 @@ class Swerve : frc2::SubsystemBase
             {RL_A},
             {RR_A}
         };
-
-        /* Stores previous angles and offset */
-        /* Prev Angle, Offset, Raw usable */
-        float angle_matrix[4][3];
 };
 
 #endif
