@@ -2,12 +2,15 @@
 #include <iostream>
 #include <math.h>
 
+using namespace ctre::phoenix::motorcontrol;
+
 #define F_PI 3.14159f
 
 Swerve::Swerve(float length, float width)
 {
     this->chassis_info.length = length;
     this->chassis_info.width = width;
+
     for(int i = 0; i < 4; i++)
     {
         /* Zero out our angle matrix initially */
@@ -16,6 +19,8 @@ Swerve::Swerve(float length, float width)
         this->raw_usable_matrix[i] = 0;
 
         /* Config our angle motors using PID system */
+        this->ANGLE_MOTORS->ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor,0,0);
+        this->ANGLE_MOTORS->ConfigIntegratedSensorAbsoluteRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
         this->ANGLE_MOTORS[i].Config_kP(0, SWERVE_P);
         this->ANGLE_MOTORS[i].Config_kI(1, SWERVE_I);
         this->ANGLE_MOTORS[i].Config_kD(2, SWERVE_D);
@@ -36,8 +41,8 @@ void Swerve::print_swerve_math(wheel_info math)
 
 void Swerve::drive(float y, float x, float x2, float gyro)
 {
-    bool y_deadzone;
-    bool y_move_abs;
+    bool y_deadzone = false;
+    bool y_move_abs = false;
 
     /* Ignore our deadzone and fix the moving forward issue */
     if(y < DEADZONE_THRES && y > -DEADZONE_THRES)
@@ -90,7 +95,7 @@ void Swerve::drive(float y, float x, float x2, float gyro)
         /* Save new angle as previous */
         this->angle_matrix[i][0] = this->math_dest.wheel_angle[i];
 
-        this->raw_usable_matrix[i] = -((this->math_dest.wheel_angle[i] + this->angle_matrix[i][1] / (F_PI * 2)) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION);
+        this->raw_usable_matrix[i] = -((this->math_dest.wheel_angle[i] + this->angle_matrix[i][1]) / (F_PI * 2) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION);
     }
 
     /* Only run our motors once everything is calculated */
@@ -105,7 +110,7 @@ void Swerve::drive(float y, float x, float x2, float gyro)
     {
         this->ANGLE_MOTORS[i].Set(ctre::phoenix::motorcontrol::ControlMode::Position, this->raw_usable_matrix[i]);
         this->raw_usable_matrix[i] = 0;
-    }
+    } 
 
     y_deadzone = false;
     y_move_abs = false;
