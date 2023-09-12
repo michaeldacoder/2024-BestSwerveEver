@@ -141,21 +141,7 @@ void Swerve::drive(float y, float x, float x2, float gyro)
 
     /* Make our angles workable, taken from last year. Seems to work! */
     for(i = 0; i < 4; i++)
-    {
-        if(abs(this->angle_matrix[i][0] - this->math_dest.wheel_angle[i]) > F_PI && this->angle_matrix[i][0] < this->math_dest.wheel_angle[i])
-        {
-            this->angle_matrix[i][1] -= 2 * F_PI;
-        }
-        if(abs(this->angle_matrix[i][0] - this->math_dest.wheel_angle[i]) > F_PI && this->angle_matrix[i][0] > this->math_dest.wheel_angle[i])
-        {
-            this->angle_matrix[i][1] += 2 * F_PI;
-        }
-
-        /* Save new angle as previous */
-        this->angle_matrix[i][0] = this->math_dest.wheel_angle[i];
-
-        this->raw_usable_matrix[i] = -((this->math_dest.wheel_angle[i] + this->angle_matrix[i][1]) / (F_PI * 2) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION);
-    }
+    { this->raw_usable_matrix[i] = -((this->math_dest.wheel_angle[i]) / (F_PI * 2) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION); }
 
     /* Only run our motors once everything is calculated */
     for(i = 0; i < 4; i++)
