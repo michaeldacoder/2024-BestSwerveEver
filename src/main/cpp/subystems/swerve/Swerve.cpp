@@ -151,9 +151,9 @@ void Swerve::drive(float y, float x, float x2, float gyro)
     print_swerve_math(this->math_dest);
 
     /* Find the percent to max angle (180 or -180) and then multiple by the counts required to get to that required angle.      */
-    /* Equivalent to x / SWERVE_WHEEL_COUNTS_PER_REVOLUTION = y / 180 where y is angle and x is raw sensor units for the encoder*/
+    /* Equivalent to x / SWERVE_WHEEL_COUNTS_PER_REVOLUTION = y / 360 where y is angle and x is raw sensor units for the encoder*/
     for(i = 0; i < 4; i++)
-    { this->raw_usable[i] = ((this->math_dest.wheel_angle[i] / 180) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION); }
+    { this->raw_usable[i] = ((this->math_dest.wheel_angle[i] / 360) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION); }
 
     /* Only run our motors once everything is calculated */
     for(i = 0; i < 4; i++)
