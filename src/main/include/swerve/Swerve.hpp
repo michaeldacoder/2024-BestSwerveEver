@@ -57,6 +57,7 @@ class Swerve : frc2::SubsystemBase
         void print_swerve_math(wheel_info math); // debug
         bool toggle_field_centricity(); // returns changed state
         void calculate_wheel_information(wheel_info *dest, struct size_constants cons, float fwd, float str, float rotate, uint8_t field_centric, float gyro);
+        void clear_swerve_memory(); // call when values are stuckington
     private:
     
         /* Save point for speed and angle values */
@@ -66,9 +67,9 @@ class Swerve : frc2::SubsystemBase
         struct size_constants chassis_info;
 
         /* Stores previous angles and offset */
-        /* Prev Angle, Offset, Raw usable */
+        /* Prev Angle, Offset */
         float angle_matrix[4][2];
-        double raw_usable_matrix[4];
+        double raw_usable[4];
 
         /* Motor bank. Follows the format in the math_dest 
             0 = front right, 1 = front left 

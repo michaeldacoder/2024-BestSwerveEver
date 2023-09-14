@@ -43,7 +43,7 @@ void Robot::TeleopPeriodic() {
   DRIVE.drive(-y, x, x2, 0);
 }
 
-void Robot::DisabledInit() {}
+void Robot::DisabledInit() { DRIVE.clear_swerve_memory(); }
 
 void Robot::DisabledPeriodic() {}
 
