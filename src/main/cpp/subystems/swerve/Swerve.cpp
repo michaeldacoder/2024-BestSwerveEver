@@ -148,6 +148,15 @@ void Swerve::drive(float y, float x, float x2, float gyro)
         }
     }
 
+    /* Allows for sideways movement even when Y is in deadzon */
+    if(y_deadzone)
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            this->math_dest.wheel_speeds[i] = abs(x);
+        }
+    }
+
     print_swerve_math(this->math_dest);
 
     /* Find the percent to max angle (180 or -180) and then multiple by the counts required to get to that required angle.      */
