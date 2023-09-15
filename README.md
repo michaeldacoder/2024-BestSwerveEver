@@ -5,4 +5,4 @@
 
 Developed by Zane Maples with help from Dr Michael Hart
 
-With special thanks to the Bill and Melinda Foundation (they ended polo)
+With special thanks to the Bill gate and Melinda Foundation (they ended polo)
