@@ -11,9 +11,6 @@ Swerve::Swerve(float length, float width)
 
     for(int i = 0; i < 4; i++)
     {
-        /* Zero out our angle matrix initially */
-        this->angle_matrix[i][0] = 0;
-        this->angle_matrix[i][1] = 0;
         this->raw_usable[i] = 0;
 
         /* Config our angle motors using PID system */

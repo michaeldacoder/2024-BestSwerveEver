@@ -66,9 +66,7 @@ class Swerve : frc2::SubsystemBase
         /* Width and Height */
         struct size_constants chassis_info;
 
-        /* Stores previous angles and offset */
-        /* Prev Angle, Offset */
-        float angle_matrix[4][2];
+        /* Stores the raw usable units for the motor controllers */
         double raw_usable[4];
 
         /* Motor bank. Follows the format in the math_dest 
