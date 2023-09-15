@@ -13,9 +13,11 @@
 #define RR_A 11
 
 /* Swerve Constants */
-#define DEADZONE_THRES .05 // Adjust this value higher to combat crappy shitty horrible controllers 
-#define SWERVE_GEAR_RATIO 12 // Physical gear ratio for the motors
-#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 2048
+#define DEADZONE_THRES .05   /* Raise to counter joystick drift */
+#define SWERVE_GEAR_RATIO 12 /* Steering gear ratio             */
+/* The amount of raw sensor units to complete one full rotation */
+#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 2048 
+/* PID Values for the motorcontrollers, taken from last year    */
 #define SWERVE_P .2245
 #define SWERVE_I .0000185
 #define SWERVE_D .000003
@@ -28,8 +30,6 @@
 
 struct wheel_information
 {
-	/* Assuming one wheel in each corner */
-	
 	/* Order of wheels as in the real world: */
 	/* 0 = front right, 1 = front left       */
 	/* 2 = rear left,   3 = rear right       */

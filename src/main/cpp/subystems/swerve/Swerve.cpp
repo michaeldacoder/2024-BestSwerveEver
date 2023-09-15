@@ -4,15 +4,25 @@
 
 using namespace ctre::phoenix::motorcontrol;
 
+void Swerve::clear_swerve_memory()
+{
+    for(int i = 0; i < 4; i++)
+    {
+        this->math_dest.wheel_angle[i] = 0;
+        this->math_dest.wheel_speeds[i] = 0;
+        this->raw_usable[i] = 0;
+    }
+}
+
 Swerve::Swerve(float length, float width)
 {
     this->chassis_info.length = length;
     this->chassis_info.width = width;
 
+    clear_swerve_memory();
+
     for(int i = 0; i < 4; i++)
     {
-        this->raw_usable[i] = 0;
-
         /* Config our angle motors using PID system */
         this->ANGLE_MOTORS->ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor,0,0);
         this->ANGLE_MOTORS->ConfigIntegratedSensorAbsoluteRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
@@ -92,16 +102,6 @@ void Swerve::print_swerve_math(wheel_info math)
     }
 }
 
-void Swerve::clear_swerve_memory()
-{
-    for(int i = 0; i < 4; i++)
-    {
-        this->math_dest.wheel_angle[i] = 0;
-        this->math_dest.wheel_speeds[i] = 0;
-        this->raw_usable[i] = 0;
-    }
-}
-
 /* When field centric mode is disabled 'gyro' is ignored */
 
 void Swerve::drive(float y, float x, float x2, float gyro)
@@ -143,7 +143,7 @@ void Swerve::drive(float y, float x, float x2, float gyro)
         }
     }
 
-    /* Allows for sideways movement even when Y is in deadzon */
+    /* Allows for sideways movement even when Y is in deadzone */
     if(y_deadzone)
     {
         for(int i = 0; i < 4; i++)
