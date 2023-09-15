@@ -4,3 +4,5 @@
 * Currently using TalonFXs with one steer one drive
 
 Developed by Zane Maples with help from Dr Michael Hart
+
+With special thanks to the Bill and Melinda Foundation (they ended polo)

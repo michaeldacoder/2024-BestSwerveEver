@@ -4,8 +4,6 @@
 
 using namespace ctre::phoenix::motorcontrol;
 
-#define F_PI 3.14159f
-
 Swerve::Swerve(float length, float width)
 {
     this->chassis_info.length = length;
