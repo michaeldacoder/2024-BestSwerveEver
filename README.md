@@ -3,6 +3,6 @@
 * Driver code written in C++.
 * Currently using TalonFXs with one steer one drive
 
-Developed by Zane Maples with help from Dr Michael Hart
+Developed by Zane Maples with help from Dr Michael Hart and major thanks to Mr. Cash Egley
 
 With special thanks to the Bill and Melinda Gates Foundation (they ended polo)
