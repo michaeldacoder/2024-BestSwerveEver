@@ -2,8 +2,6 @@
 #include <iostream>
 #include <math.h>
 
-using namespace ctre::phoenix::motorcontrol;
-
 void Swerve::clear_swerve_memory()
 {
     for(int i = 0; i < 4; i++)
@@ -23,16 +21,19 @@ Swerve::Swerve(float length, float width)
 
     for(int i = 0; i < 4; i++)
     {
-        /* Config our angle motors using PID system */
-        this->ANGLE_MOTORS->ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor,0,0);
-        this->ANGLE_MOTORS->ConfigIntegratedSensorAbsoluteRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
-        this->ANGLE_MOTORS[i].Config_kP(0, SWERVE_P);
-        this->ANGLE_MOTORS[i].Config_kI(0, SWERVE_I);
-        this->ANGLE_MOTORS[i].Config_kD(0, SWERVE_D);
-        this->ANGLE_MOTORS[i].Config_kF(0, 0.0);
+        /* Set current limit */
+        this->DRIVE_MOTORS[i]->SetSmartCurrentLimit(MAX_AMPERAGE);
+        this->ANGLE_MOTORS[i]->SetSmartCurrentLimit(MAX_AMPERAGE);
 
-        /* Set default settings for drive motors */
-        this->DRIVE_MOTORS->ConfigFactoryDefault();
+        /* Burn flash everytime (FUCK REV!!!) */
+        this->DRIVE_MOTORS[i]->BurnFlash();
+        this->ANGLE_MOTORS[i]->BurnFlash();
+
+        /* TODO: check these values, they were for the talons + a different swerve module */
+        SparkMaxPIDController controller = this->ANGLE_MOTORS[i]->GetPIDController();
+        controller.SetP(SWERVE_P);
+        controller.SetI(SWERVE_I);
+        controller.SetD(SWERVE_D);
     }
 };
 
@@ -162,8 +163,8 @@ void Swerve::drive(float y, float x, float x2, float gyro)
     /* Only run our motors once everything is calculated */
     for(i = 0; i < 4; i++)
     {
-        this->DRIVE_MOTORS[i].Set(ctre::phoenix::motorcontrol::ControlMode::PercentOutput, this->math_dest.wheel_speeds[i]);
-        this->ANGLE_MOTORS[i].Set(ctre::phoenix::motorcontrol::ControlMode::Position, this->raw_usable[i]);
+        this->DRIVE_MOTORS[i]->Set(this->math_dest.wheel_speeds[i]);
+        this->ANGLE_ENCODERS[i].SetPosition(this->raw_usable[i]);
 
         /* Clear "sticky" values that are stuck in memory, if the robot is receiving input this doesn't matter anyways.*/
         /* Only affects the robot when stopped!! */

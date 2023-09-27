@@ -12,6 +12,9 @@
 #define RL_A 9
 #define RR_A 11
 
+/* Hardware Constants */
+#define MAX_AMPERAGE 40
+
 /* Swerve Constants */
 #define DEADZONE_THRES .05   /* Raise to counter joystick drift */
 #define SWERVE_GEAR_RATIO 12 /* Steering gear ratio             */
@@ -24,6 +27,7 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <ctre/phoenix/motorcontrol/can/WPI_TalonFX.h>
+#include <rev/CANSparkMax.h>
 
 /* 180 / Pi */
 #define MAGIC_NUMBER 57.29577f
@@ -46,7 +50,7 @@ struct size_constants
 	float width;
 };
 
-using namespace ctre::phoenix::motorcontrol::can;
+using namespace rev;
 
 class Swerve : frc2::SubsystemBase
 {
@@ -73,20 +77,42 @@ class Swerve : frc2::SubsystemBase
             0 = front right, 1 = front left 
             2 = rear left,   3 = rear right */
         
-        // feast upon this awesome code!! (yes it works)
-        WPI_TalonFX DRIVE_MOTORS[4] = 
+        /* I FUCKING HATE REV ROBOTICS!! GOD DOES NOT SHINE BRIGHTLY ON THIS GOD FORSAKEN COMPANY!!! 
+            THEY MAKE MY CODEL OOKING LIKE PYHTON STUPID SCRATCH BUILDING BLOCK CODE I HATE IT SO MUCH
+        */
+
+        CANSparkMax FR_MOTOR_M{FR_M,CANSparkMaxLowLevel::MotorType::kBrushless};
+        CANSparkMax FL_MOTOR_M{FL_M,CANSparkMaxLowLevel::MotorType::kBrushless};
+        CANSparkMax RL_MOTOR_M{RL_M,CANSparkMaxLowLevel::MotorType::kBrushless};
+        CANSparkMax RR_MOTOR_M{RR_M,CANSparkMaxLowLevel::MotorType::kBrushless};
+
+        CANSparkMax* DRIVE_MOTORS[4] = 
         {
-            {FR_M},
-            {FL_M},
-            {RL_M},
-            {RR_M}
+            &FR_MOTOR_M,
+            &FL_MOTOR_M,
+            &RL_MOTOR_M,
+            &RR_MOTOR_M
         };
-        WPI_TalonFX ANGLE_MOTORS[4] = 
+
+        CANSparkMax FR_MOTOR_A{FR_A,CANSparkMaxLowLevel::MotorType::kBrushless};
+        CANSparkMax FL_MOTOR_A{FL_A,CANSparkMaxLowLevel::MotorType::kBrushless};
+        CANSparkMax RL_MOTOR_A{RL_A,CANSparkMaxLowLevel::MotorType::kBrushless};
+        CANSparkMax RR_MOTOR_A{RR_A,CANSparkMaxLowLevel::MotorType::kBrushless};
+
+        CANSparkMax* ANGLE_MOTORS[4] = 
         {
-            {FR_A},
-            {FL_A},
-            {RL_A},
-            {RR_A}
+            &FR_MOTOR_A,
+            &FL_MOTOR_A,
+            &RL_MOTOR_A,
+            &RR_MOTOR_A
+        };
+
+        SparkMaxRelativeEncoder ANGLE_ENCODERS[4] =
+        {
+            FR_MOTOR_A.GetEncoder(),
+            FL_MOTOR_A.GetEncoder(),
+            RL_MOTOR_A.GetEncoder(),
+            RR_MOTOR_A.GetEncoder()
         };
 };
 
