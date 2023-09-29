@@ -17,7 +17,7 @@
 
 /* Swerve Constants */
 #define DEADZONE_THRES .05   /* Raise to counter joystick drift */
-#define SWERVE_GEAR_RATIO 12 /* Steering gear ratio             */
+#define SWERVE_GEAR_RATIO 21.4285f /* Steering gear ratio       */
 /* The amount of raw sensor units to complete one full rotation */
 #define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 42 
 /* PID Values for the motorcontrollers, taken from last year    */
