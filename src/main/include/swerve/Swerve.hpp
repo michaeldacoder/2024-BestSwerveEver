@@ -19,14 +19,13 @@
 #define DEADZONE_THRES .05   /* Raise to counter joystick drift */
 #define SWERVE_GEAR_RATIO 12 /* Steering gear ratio             */
 /* The amount of raw sensor units to complete one full rotation */
-#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 2048 
+#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 42 
 /* PID Values for the motorcontrollers, taken from last year    */
 #define SWERVE_P .2245
 #define SWERVE_I .0000185
 #define SWERVE_D .000003
 
 #include <frc2/command/SubsystemBase.h>
-#include <ctre/phoenix/motorcontrol/can/WPI_TalonFX.h>
 #include <rev/CANSparkMax.h>
 
 /* 180 / Pi */
