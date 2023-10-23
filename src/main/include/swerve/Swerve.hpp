@@ -17,7 +17,7 @@
 
 /* Swerve Constants */
 #define DEADZONE_THRES .05   /* Raise to counter joystick drift */
-#define SWERVE_GEAR_RATIO 21.4285f /* Steering gear ratio       */
+#define SWERVE_GEAR_RATIO 150/7 /* Steering gear ratio       */
 /* The amount of raw sensor units to complete one full rotation */
 #define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 42 
 /* PID Values for the motorcontrollers, taken from last year    */
@@ -106,13 +106,7 @@ class Swerve : frc2::SubsystemBase
             &RR_MOTOR_A
         };
 
-        SparkMaxRelativeEncoder ANGLE_ENCODERS[4] =
-        {
-            FR_MOTOR_A.GetEncoder(),
-            FL_MOTOR_A.GetEncoder(),
-            RL_MOTOR_A.GetEncoder(),
-            RR_MOTOR_A.GetEncoder()
-        };
+        SparkMaxRelativeEncoder* ANGLE_ENCODERS[4];
 };
 
 #endif

@@ -25,15 +25,21 @@ Swerve::Swerve(float length, float width)
         this->DRIVE_MOTORS[i]->SetSmartCurrentLimit(MAX_AMPERAGE);
         this->ANGLE_MOTORS[i]->SetSmartCurrentLimit(MAX_AMPERAGE);
 
+        /* Turn on brake coast mode, snappier */
+        this->DRIVE_MOTORS[i]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
+        this->ANGLE_MOTORS[i]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
+
         /* Burn flash everytime (FUCK REV!!!) */
         this->DRIVE_MOTORS[i]->BurnFlash();
         this->ANGLE_MOTORS[i]->BurnFlash();
 
-        /* TODO: check these values, they were for the talons + a different swerve module */
-        SparkMaxPIDController controller = this->ANGLE_MOTORS[i]->GetPIDController();
-        controller.SetP(SWERVE_P);
-        controller.SetI(SWERVE_I);
-        controller.SetD(SWERVE_D);
+        /* PIDs */
+        this->ANGLE_MOTORS[i]->GetPIDController().SetP(SWERVE_P);
+        this->ANGLE_MOTORS[i]->GetPIDController().SetI(SWERVE_I);
+        this->ANGLE_MOTORS[i]->GetPIDController().SetD(SWERVE_D);
+
+        /* Get real relative encoders */
+        this->ANGLE_ENCODERS[i] = new SparkMaxRelativeEncoder(this->ANGLE_MOTORS[i]->GetEncoder());
     }
 };
 
@@ -153,7 +159,7 @@ void Swerve::drive(float y, float x, float x2, float gyro)
         }
     }
 
-    print_swerve_math(this->math_dest);
+    //print_swerve_math(this->math_dest);
 
     /* Find the percent to max angle (180 or -180) and then multiple by the counts required to get to that required angle.      */
     /* Equivalent to x / SWERVE_WHEEL_COUNTS_PER_REVOLUTION = y / 360 where y is angle and x is raw sensor units for the encoder*/
@@ -164,7 +170,10 @@ void Swerve::drive(float y, float x, float x2, float gyro)
     for(i = 0; i < 4; i++)
     {
         this->DRIVE_MOTORS[i]->Set(this->math_dest.wheel_speeds[i]);
-        this->ANGLE_ENCODERS[i].SetPosition(this->raw_usable[i]);
+        this->ANGLE_ENCODERS[i]->SetPosition(this->raw_usable[i]);
+
+        /* Print our raw encoder values, FUCK REV!!! GRAHHH GRAHHH BOOM!! */
+        std::cout << i << " " << this->ANGLE_ENCODERS[i]->GetPosition() << "\n";
 
         /* Clear "sticky" values that are stuck in memory, if the robot is receiving input this doesn't matter anyways.*/
         /* Only affects the robot when stopped!! */
