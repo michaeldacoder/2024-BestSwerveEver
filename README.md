@@ -2,6 +2,7 @@
 
 * Driver code written in C++.
 * Currently using NEOs / SPARKMAXs
+* **NOT A FULLY FUNCTIONING ROBOT. BASEPLATE CODE FOR SWERVE**
 
 Developed by Zane Maples with help from Dr Michael Hart
 
