@@ -20,7 +20,7 @@
 #define SWERVE_GEAR_RATIO 150/7 /* Steering gear ratio       */
 /* The amount of raw sensor units to complete one full rotation */
 #define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 42 
-/* PID Values for the motorcontrollers, taken from last year    */
+/* PID Values for the motorcontrollers, taken from last year TODO: GET REAL FUCKING THINGAMABBOBBYIES   */
 #define SWERVE_P .2245
 #define SWERVE_I .0000185
 #define SWERVE_D .000003
@@ -107,6 +107,7 @@ class Swerve : frc2::SubsystemBase
         };
 
         SparkMaxRelativeEncoder* ANGLE_ENCODERS[4];
+        SparkMaxPIDController* PID_CONTROLLERS[4];
 };
 
 #endif

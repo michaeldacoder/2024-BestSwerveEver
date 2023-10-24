@@ -34,9 +34,10 @@ Swerve::Swerve(float length, float width)
         this->ANGLE_MOTORS[i]->BurnFlash();
 
         /* PIDs */
-        this->ANGLE_MOTORS[i]->GetPIDController().SetP(SWERVE_P);
-        this->ANGLE_MOTORS[i]->GetPIDController().SetI(SWERVE_I);
-        this->ANGLE_MOTORS[i]->GetPIDController().SetD(SWERVE_D);
+        this->PID_CONTROLLERS[i] = new SparkMaxPIDController(this->ANGLE_MOTORS[i]->GetPIDController());
+        this->PID_CONTROLLERS[i]->SetP(SWERVE_P);
+        this->PID_CONTROLLERS[i]->SetI(SWERVE_I);
+        this->PID_CONTROLLERS[i]->SetD(SWERVE_D);
 
         /* Get real relative encoders */
         this->ANGLE_ENCODERS[i] = new SparkMaxRelativeEncoder(this->ANGLE_MOTORS[i]->GetEncoder());
