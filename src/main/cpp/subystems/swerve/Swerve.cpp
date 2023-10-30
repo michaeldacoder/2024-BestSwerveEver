@@ -41,6 +41,7 @@ Swerve::Swerve(float length, float width)
 
         /* Get real relative encoders */
         this->ANGLE_ENCODERS[i] = new SparkMaxRelativeEncoder(this->ANGLE_MOTORS[i]->GetEncoder());
+        std::cout << this->ANGLE_ENCODERS[i]->GetCountsPerRevolution() << "\n";
     }
 };
 
