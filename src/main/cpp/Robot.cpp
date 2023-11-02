@@ -11,8 +11,8 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/Joystick.h>
 
-float len = 10;
-float width = 20;
+float len = 30;
+float width = 30;
 
 Swerve DRIVE {len, width};
 frc::Joystick Jostick { 0 };

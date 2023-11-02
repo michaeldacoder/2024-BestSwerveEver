@@ -77,8 +77,7 @@ class Swerve : frc2::SubsystemBase
             2 = rear left,   3 = rear right */
         
         /* I FUCKING HATE REV ROBOTICS!! GOD DOES NOT SHINE BRIGHTLY ON THIS GOD FORSAKEN COMPANY!!! 
-            THEY MAKE MY CODEL OOKING LIKE PYHTON STUPID SCRATCH BUILDING BLOCK CODE I HATE IT SO MUCH
-        */
+            THEY MAKE MY CODEL OOKING LIKE PYHTON STUPID SCRATCH BUILDING BLOCK CODE I HATE IT SO MUCH */
 
         CANSparkMax FR_MOTOR_M{FR_M,CANSparkMaxLowLevel::MotorType::kBrushless};
         CANSparkMax FL_MOTOR_M{FL_M,CANSparkMaxLowLevel::MotorType::kBrushless};
