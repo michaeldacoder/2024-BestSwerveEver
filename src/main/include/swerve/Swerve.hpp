@@ -2,15 +2,15 @@
 #define SWERVE_H
 
 /* CAN IDS */
-#define FR_M 6
-#define FL_M 8
-#define RL_M 10
-#define RR_M 12
+#define FR_M 13
+#define FL_M 12
+#define RL_M 7
+#define RR_M 9
 
-#define FR_A 5
-#define FL_A 7
-#define RL_A 9
-#define RR_A 11
+#define FR_A 6
+#define FL_A 4
+#define RL_A 8
+#define RR_A 10
 
 /* Hardware Constants */
 #define MAX_AMPERAGE 40
