@@ -39,7 +39,6 @@ void Robot::TeleopPeriodic() {
   float x = Jostick.GetX();
   float x2 = Jostick.GetRawAxis(4);
 
-
   DRIVE.drive(-y, x, x2, 0);
 }
 

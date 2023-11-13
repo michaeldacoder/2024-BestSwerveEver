@@ -2,15 +2,15 @@
 #define SWERVE_H
 
 /* CAN IDS */
-#define FR_M 6
-#define FL_M 8
-#define RL_M 10
-#define RR_M 12
+#define FR_M 13
+#define FL_M 12
+#define RL_M 7
+#define RR_M 9
 
-#define FR_A 5
-#define FL_A 7
-#define RL_A 9
-#define RR_A 11
+#define FR_A 6
+#define FL_A 4
+#define RL_A 8
+#define RR_A 10
 
 /* Hardware Constants */
 #define MAX_AMPERAGE 40
@@ -19,11 +19,13 @@
 #define DEADZONE_THRES .05   /* Raise to counter joystick drift */
 #define SWERVE_GEAR_RATIO 21.42857f /* Steering gear ratio       */
 /* The amount of raw sensor units to complete one full rotation */
-#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION SWERVE_GEAR_RATIO * 4096 // hory fucking shit!!
+#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION 21 // hory fucking shit!!
+
+#define SWERVE_SPEED_MULTIPLIER .5f
 /* PID Values for the motorcontrollers, taken from last year TODO: GET REAL FUCKING THINGAMABBOBBYIES   */
 #define SWERVE_P .1
-#define SWERVE_I 0
-#define SWERVE_D 0
+#define SWERVE_I 0.0
+#define SWERVE_D 0.0
 
 #include <frc2/command/SubsystemBase.h>
 #include <rev/CANSparkMax.h>
@@ -54,6 +56,7 @@ using namespace rev;
 class Swerve : frc2::SubsystemBase
 {
     public:
+        int setUnits = 0;
         bool field_centered = false;
         Swerve(float length, float width);
         void drive(float x, float y, float x2, float gyro); // gyro is ignored when field_centered is false

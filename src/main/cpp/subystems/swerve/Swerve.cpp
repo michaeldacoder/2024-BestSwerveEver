@@ -161,8 +161,6 @@ void Swerve::drive(float y, float x, float x2, float gyro)
         }
     }
 
-    //print_swerve_math(this->math_dest);
-
     /* Find the percent to max angle (180 or -180) and then multiple by the counts required to get to that required angle.      */
     /* Equivalent to x / SWERVE_WHEEL_COUNTS_PER_REVOLUTION = y / 360 where y is angle and x is raw sensor units for the encoder*/
     for(i = 0; i < 4; i++)
@@ -171,17 +169,23 @@ void Swerve::drive(float y, float x, float x2, float gyro)
     /* Only run our motors once everything is calculated */
     for(i = 0; i < 4; i++)
     {
-        this->DRIVE_MOTORS[i]->Set(this->math_dest.wheel_speeds[i]);
-        this->ANGLE_ENCODERS[i]->SetPosition(this->raw_usable[i]);
+        this->DRIVE_MOTORS[i]->Set(this->math_dest.wheel_speeds[i] * SWERVE_SPEED_MULTIPLIER);
 
-        /* Print our raw encoder values, FUCK REV!!! GRAHHH GRAHHH BOOM!! */
-        std::cout << i << " " << this->ANGLE_ENCODERS[i]->GetPosition() << "\n";
+        /* This stop it from going 360 around (all my michaels fault if it breaks)*/
+        if((this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()) > 21)
+        {
+            this->raw_usable[i] = -(42-(this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()));
+        }
+
+        this->PID_CONTROLLERS[i]->SetReference(this->raw_usable[i],CANSparkMax::ControlType::kPosition);
+       
+        /* Print our raw encoder values */
+        std::cout << i << "Actual: " << this->ANGLE_ENCODERS[i]->GetPosition() << " Desired: " << this->raw_usable[i] <<"\n";
 
         /* Clear "sticky" values that are stuck in memory, if the robot is receiving input this doesn't matter anyways.*/
         /* Only affects the robot when stopped!! */
         this->math_dest.wheel_speeds[i] = 0;
     }
-
     y_deadzone = false;
     y_move_abs = false;
 }
