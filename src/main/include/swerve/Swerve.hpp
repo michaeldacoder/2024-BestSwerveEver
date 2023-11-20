@@ -19,10 +19,10 @@
 #define DEADZONE_THRES .05   /* Raise to counter joystick drift */
 #define SWERVE_GEAR_RATIO 21.42857f /* Steering gear ratio       */
 /* The amount of raw sensor units to complete one full rotation */
-#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION 21 // hory fucking shit!!
+#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION 21 
 
 #define SWERVE_SPEED_MULTIPLIER .5f
-/* PID Values for the motorcontrollers, taken from last year TODO: GET REAL FUCKING THINGAMABBOBBYIES   */
+/* PID Values for the motorcontrollers */
 #define SWERVE_P .1
 #define SWERVE_I 0.0
 #define SWERVE_D 0.0
@@ -79,9 +79,6 @@ class Swerve : frc2::SubsystemBase
             0 = front right, 1 = front left 
             2 = rear left,   3 = rear right */
         
-        /* I FUCKING HATE REV ROBOTICS!! GOD DOES NOT SHINE BRIGHTLY ON THIS GOD FORSAKEN COMPANY!!! 
-            THEY MAKE MY CODEL OOKING LIKE PYHTON STUPID SCRATCH BUILDING BLOCK CODE I HATE IT SO MUCH */
-
         CANSparkMax FR_MOTOR_M{FR_M,CANSparkMaxLowLevel::MotorType::kBrushless};
         CANSparkMax FL_MOTOR_M{FL_M,CANSparkMaxLowLevel::MotorType::kBrushless};
         CANSparkMax RL_MOTOR_M{RL_M,CANSparkMaxLowLevel::MotorType::kBrushless};
