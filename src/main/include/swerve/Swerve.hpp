@@ -17,11 +17,14 @@
 
 /* Swerve Constants */
 #define DEADZONE_THRES .05   /* Raise to counter joystick drift */
-#define SWERVE_GEAR_RATIO 21.42857f /* Steering gear ratio       */
-/* The amount of raw sensor units to complete one full rotation */
-#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION 21 
 
+/* The amount of raw sensor units to complete one full rotation */
+#define SWERVE_WHEEL_COUNTS_PER_REVOLUTION 21 /* god neos are weird! */
+
+/* Speed multipliers (rot. speed is a set speed)*/
 #define SWERVE_SPEED_MULTIPLIER .5f
+#define SWERVE_ROTATION_SPEED .5
+
 /* PID Values for the motorcontrollers */
 #define SWERVE_P .1
 #define SWERVE_I 0.0
@@ -56,7 +59,7 @@ using namespace rev;
 class Swerve : frc2::SubsystemBase
 {
     public:
-        int setUnits = 0;
+        int setUnits = 0; /* test value */
         bool field_centered = false;
         Swerve(float length, float width);
         void drive(float x, float y, float x2, float gyro); // gyro is ignored when field_centered is false
@@ -65,7 +68,9 @@ class Swerve : frc2::SubsystemBase
         void calculate_wheel_information(wheel_info *dest, struct size_constants cons, float fwd, float str, float rotate, uint8_t field_centric, float gyro);
         void clear_swerve_memory(); // call when values are stuckington
     private:
-    
+        void deadzone_correction(float *x, float *y, float *x2);
+        float last_inputs[4]; // 0,3 element not used, just for alignment
+        
         /* Save point for speed and angle values */
         wheel_info math_dest;
 

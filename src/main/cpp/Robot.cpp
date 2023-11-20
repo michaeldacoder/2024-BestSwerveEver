@@ -16,6 +16,7 @@ float width = 30;
 
 Swerve DRIVE {len, width};
 frc::Joystick Jostick { 0 };
+int timer = 0;
 
 void Robot::RobotInit() {
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
@@ -35,11 +36,17 @@ void Robot::TeleopPeriodic() {
   /* Standard config for logitech controller. 
      Left Joystick X + Y controls strafe + forwards respectively
      Right Joystick X controls rotation */
-  float y = Jostick.GetY();
-  float x = Jostick.GetX();
-  float x2 = Jostick.GetRawAxis(4);
+  //if(timer == 2)
+  //{
+    float y = Jostick.GetY();
+    float x = Jostick.GetX();
+    float x2 = Jostick.GetRawAxis(4);
 
-  DRIVE.drive(-y, x, x2, 0);
+    DRIVE.drive(-y, x, x2, 0);
+    //timer = 0;
+    //return;
+  //}
+  //timer++;
 }
 
 void Robot::DisabledInit() { DRIVE.clear_swerve_memory(); }

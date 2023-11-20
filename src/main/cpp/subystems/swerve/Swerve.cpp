@@ -9,6 +9,7 @@ void Swerve::clear_swerve_memory()
         this->math_dest.wheel_angle[i] = 0;
         this->math_dest.wheel_speeds[i] = 0;
         this->raw_usable[i] = 0;
+        this->last_inputs[i] = 0; 
     }
 }
 
@@ -101,6 +102,84 @@ void Swerve::calculate_wheel_information(wheel_info *dest, struct size_constants
 	return;
 }
 
+void Swerve::deadzone_correction(float *x, float *y, float *x2)
+{
+    /* Pass in the values and they are corrected, PRAYING TO GOD that it doesn't seg fault or something :D */
+    bool y_deadzone = false;
+    bool x_deadzone = false;
+    bool y_move_abs = false;
+    bool rot_deadzone = false;
+
+    /* Ignore our deadzone and fix the moving forward issue */
+    if(*y < DEADZONE_THRES && *y > -DEADZONE_THRES)
+    {
+        *y = 0;
+        y_deadzone = true;
+    }   
+    if(*x < DEADZONE_THRES && *x > -DEADZONE_THRES)
+    {
+        *x = 0;
+        x_deadzone = true;
+        if(!y_deadzone)
+        {
+            /* Sets so that the true forward value is used incase of no strafing. Horrible hack but it works. */
+            y_move_abs = true;
+        }
+    } 
+    if(*x2 < DEADZONE_THRES && *x2 > -DEADZONE_THRES)
+    {
+        *x2 = 0;
+        rot_deadzone = true;
+    }
+
+    int i;
+
+    /* Allows for forward movement even when X is in deadzone */
+    if(y_move_abs)
+    {
+        for(i = 0; i < 4; i++)
+        {
+            this->math_dest.wheel_speeds[i] = abs(*y);
+        }
+    }
+
+    /* IF DEADZONE IS REACHED WE USED LAST KNOWN VALUE, WE SHOULD NEVER RESET ANGLE (according to dr hart) */
+
+    /* Allows for sideways movement even when Y is in deadzone */
+    if(y_deadzone)
+    {
+        for(i = 0; i < 4; i++)
+        {
+            this->math_dest.wheel_speeds[i] = abs(*x);
+        }
+    }
+
+    if(y_deadzone && !x_deadzone)
+    {
+        *x = this->last_inputs[1];
+    } else if (y_deadzone && x_deadzone){
+        *y = this->last_inputs[0];
+        *x = this->last_inputs[1];
+    }
+
+
+    if(rot_deadzone)
+    {
+        //*x2 = this->last_inputs[2];
+    }
+
+    /* Save our decided on values */
+
+    this->last_inputs[0] = *y;
+    this->last_inputs[1] = *x;
+    this->last_inputs[2] = *x2;
+
+    y_deadzone = false;
+    x_deadzone = false;
+    y_move_abs = false;
+    rot_deadzone = false;
+}
+
 void Swerve::print_swerve_math(wheel_info math)
 {
     std::cout << "\n";
@@ -115,79 +194,47 @@ void Swerve::print_swerve_math(wheel_info math)
 
 void Swerve::drive(float y, float x, float x2, float gyro)
 {
-    bool y_deadzone = false;
-    bool y_move_abs = false;
-
-    /* Ignore our deadzone and fix the moving forward issue */
-    if(y < DEADZONE_THRES && y > -DEADZONE_THRES)
-    {
-        y = 0;
-        y_deadzone = true;
-    }   
-    if(x < DEADZONE_THRES && x > -DEADZONE_THRES)
-    {
-        x = 0;
-        if(!y_deadzone)
-        {
-            /* Sets so that the true forward value is used incase of no strafing. Horrible hack but it works. */
-            y_move_abs = true;
-        }
-    } 
-    if(x2 < DEADZONE_THRES && x2 > -DEADZONE_THRES)
-    {
-        x2 = 0;
-    }
+    /* Correct/Sanitize our inputs */
+    deadzone_correction(&x, &y, &x2);
 
     /* Generate our math and store in dest struct to be converted / used */
     calculate_wheel_information(&this->math_dest,this->chassis_info,y,x,x2,this->field_centered,gyro);
 
-    int i;
-
-    /* Allows for forward movement even when X is in deadzone */
-    if(y_move_abs)
-    {
-        for(i = 0; i < 4; i++)
-        {
-            this->math_dest.wheel_speeds[i] = abs(y);
-        }
-    }
-
-    /* Allows for sideways movement even when Y is in deadzone */
-    if(y_deadzone)
+    /* If we are trying to rotate, move the wheels so that it actually spins, may need to adjust */
+    if(x2)
     {
         for(int i = 0; i < 4; i++)
         {
-            this->math_dest.wheel_speeds[i] = abs(x);
-        }
+            this->math_dest.wheel_speeds[i] = SWERVE_ROTATION_SPEED;
+        } 
     }
 
-    /* Find the percent to max angle (180 or -180) and then multiple by the counts required to get to that required angle.      */
-    /* Equivalent to x / SWERVE_WHEEL_COUNTS_PER_REVOLUTION = y / 360 where y is angle and x is raw sensor units for the encoder*/
-    for(i = 0; i < 4; i++)
+    /* Find the percent to max angle (180 or -180) and then multiple by the counts required to get to that required angle.       */
+    /* Equivalent to x / SWERVE_WHEEL_COUNTS_PER_REVOLUTION = y / 360 where y is angle and x is raw sensor units for the encoder */
+    for(int i = 0; i < 4; i++)
     { this->raw_usable[i] = ((this->math_dest.wheel_angle[i] / 360) * SWERVE_WHEEL_COUNTS_PER_REVOLUTION); }
 
     /* Only run our motors once everything is calculated */
-    for(i = 0; i < 4; i++)
+    for(int i = 0; i < 4; i++)
     {
         this->DRIVE_MOTORS[i]->Set(this->math_dest.wheel_speeds[i] * SWERVE_SPEED_MULTIPLIER);
 
-        /* This stop it from going 360 around (all my michaels fault if it breaks)*/
-        if((this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()) > 21)
+        /* This stop it from going 360 around (all michael's fault if it breaks)*/
+        if((this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()) > SWERVE_WHEEL_COUNTS_PER_REVOLUTION)
         {
-            this->raw_usable[i] = -(42-(this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()));
+            this->raw_usable[i] = -((SWERVE_WHEEL_COUNTS_PER_REVOLUTION*2)-(this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()));
         }
 
         this->PID_CONTROLLERS[i]->SetReference(this->raw_usable[i],CANSparkMax::ControlType::kPosition);
        
-        /* Print our raw encoder values */
+        /* Debug */
         std::cout << i << "Actual: " << this->ANGLE_ENCODERS[i]->GetPosition() << " Desired: " << this->raw_usable[i] <<"\n";
 
-        /* Clear "sticky" values that are stuck in memory, if the robot is receiving input this doesn't matter anyways.*/
+        /* Clear "sticky" values that are stuck in memory, if the robot is receiving input this doesn't matter anyways. */
         /* Only affects the robot when stopped!! */
         this->math_dest.wheel_speeds[i] = 0;
     }
-    y_deadzone = false;
-    y_move_abs = false;
+
 }
 
 bool Swerve::toggle_field_centricity()
