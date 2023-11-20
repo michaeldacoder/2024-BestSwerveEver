@@ -16,7 +16,7 @@
 #define MAX_AMPERAGE 40
 
 /* Swerve Constants */
-#define DEADZONE_THRES .05   /* Raise to counter joystick drift */
+#define DEADZONE_THRES .25   /* Raise to counter joystick drift this number is on a controller to controller basis */
 
 /* The amount of raw sensor units to complete one full rotation */
 #define SWERVE_WHEEL_COUNTS_PER_REVOLUTION 21 /* god neos are weird! */
@@ -69,8 +69,9 @@ class Swerve : frc2::SubsystemBase
         void clear_swerve_memory(); // call when values are stuckington
     private:
         void deadzone_correction(float *x, float *y, float *x2);
-        float last_inputs[4]; // 0,3 element not used, just for alignment
-        
+        double last_units[4]; // 0,3 element not used, just for alignment
+        bool use_old = false;
+
         /* Save point for speed and angle values */
         wheel_info math_dest;
 

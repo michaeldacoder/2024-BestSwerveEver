@@ -9,7 +9,7 @@ void Swerve::clear_swerve_memory()
         this->math_dest.wheel_angle[i] = 0;
         this->math_dest.wheel_speeds[i] = 0;
         this->raw_usable[i] = 0;
-        this->last_inputs[i] = 0; 
+        this->last_units[i] = 0; 
     }
 }
 
@@ -30,7 +30,7 @@ Swerve::Swerve(float length, float width)
         this->DRIVE_MOTORS[i]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
         this->ANGLE_MOTORS[i]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
 
-        /* Burn flash everytime (FUCK REV!!!) */
+        /* Burn flash everytime */
         this->DRIVE_MOTORS[i]->BurnFlash();
         this->ANGLE_MOTORS[i]->BurnFlash();
 
@@ -108,7 +108,6 @@ void Swerve::deadzone_correction(float *x, float *y, float *x2)
     bool y_deadzone = false;
     bool x_deadzone = false;
     bool y_move_abs = false;
-    bool rot_deadzone = false;
 
     /* Ignore our deadzone and fix the moving forward issue */
     if(*y < DEADZONE_THRES && *y > -DEADZONE_THRES)
@@ -129,7 +128,6 @@ void Swerve::deadzone_correction(float *x, float *y, float *x2)
     if(*x2 < DEADZONE_THRES && *x2 > -DEADZONE_THRES)
     {
         *x2 = 0;
-        rot_deadzone = true;
     }
 
     int i;
@@ -154,30 +152,14 @@ void Swerve::deadzone_correction(float *x, float *y, float *x2)
         }
     }
 
-    if(y_deadzone && !x_deadzone)
-    {
-        *x = this->last_inputs[1];
-    } else if (y_deadzone && x_deadzone){
-        *y = this->last_inputs[0];
-        *x = this->last_inputs[1];
+    /* Re Use old units instead of spinning again */
+    if(y_deadzone && x_deadzone){
+        this->use_old = true;
     }
-
-
-    if(rot_deadzone)
-    {
-        //*x2 = this->last_inputs[2];
-    }
-
-    /* Save our decided on values */
-
-    this->last_inputs[0] = *y;
-    this->last_inputs[1] = *x;
-    this->last_inputs[2] = *x2;
 
     y_deadzone = false;
     x_deadzone = false;
     y_move_abs = false;
-    rot_deadzone = false;
 }
 
 void Swerve::print_swerve_math(wheel_info math)
@@ -224,17 +206,24 @@ void Swerve::drive(float y, float x, float x2, float gyro)
         {
             this->raw_usable[i] = -((SWERVE_WHEEL_COUNTS_PER_REVOLUTION*2)-(this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()));
         }
-
-        this->PID_CONTROLLERS[i]->SetReference(this->raw_usable[i],CANSparkMax::ControlType::kPosition);
-       
+        if(use_old)
+        {
+            this->PID_CONTROLLERS[i]->SetReference(this->last_units[i],CANSparkMax::ControlType::kPosition);
+            std::cout << i << "Actual: " << this->ANGLE_ENCODERS[i]->GetPosition() << " Old_Desired: " << this->last_units[i] <<"\n";
+        } else 
+        {
+            this->PID_CONTROLLERS[i]->SetReference(this->raw_usable[i],CANSparkMax::ControlType::kPosition);
+            std::cout << i << "Actual: " << this->ANGLE_ENCODERS[i]->GetPosition() << " Desired: " << this->raw_usable[i] <<"\n";
+            this->last_units[i] = this->raw_usable[i];
+        }
+      
         /* Debug */
-        std::cout << i << "Actual: " << this->ANGLE_ENCODERS[i]->GetPosition() << " Desired: " << this->raw_usable[i] <<"\n";
-
-        /* Clear "sticky" values that are stuck in memory, if the robot is receiving input this doesn't matter anyways. */
+                /* Clear "sticky" values that are stuck in memory, if the robot is receiving input this doesn't matter anyways. */
         /* Only affects the robot when stopped!! */
         this->math_dest.wheel_speeds[i] = 0;
-    }
 
+    }
+    this->use_old = false;
 }
 
 bool Swerve::toggle_field_centricity()

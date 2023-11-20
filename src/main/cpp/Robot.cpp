@@ -11,6 +11,8 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/Joystick.h>
 
+#define SWERVE_TIMER 1
+
 float len = 30;
 float width = 30;
 
@@ -36,17 +38,17 @@ void Robot::TeleopPeriodic() {
   /* Standard config for logitech controller. 
      Left Joystick X + Y controls strafe + forwards respectively
      Right Joystick X controls rotation */
-  //if(timer == 2)
-  //{
+  if(timer == SWERVE_TIMER)
+  {
     float y = Jostick.GetY();
     float x = Jostick.GetX();
     float x2 = Jostick.GetRawAxis(4);
 
     DRIVE.drive(-y, x, x2, 0);
-    //timer = 0;
-    //return;
-  //}
-  //timer++;
+    timer = 0;
+    return;
+  }
+  timer++;
 }
 
 void Robot::DisabledInit() { DRIVE.clear_swerve_memory(); }
