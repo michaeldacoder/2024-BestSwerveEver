@@ -201,10 +201,14 @@ void Swerve::drive(float y, float x, float x2, float gyro)
     {
         this->DRIVE_MOTORS[i]->Set(this->math_dest.wheel_speeds[i] * SWERVE_SPEED_MULTIPLIER);
 
-        /* This stop it from going 360 around (all michael's fault if it breaks)*/
+        /* This stop it from going 360 around (all michael's fault if it breaks)*/ 
         if((this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()) > SWERVE_WHEEL_COUNTS_PER_REVOLUTION)
         {
-            this->raw_usable[i] = -((SWERVE_WHEEL_COUNTS_PER_REVOLUTION*2)-(this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()));
+            this->raw_usable[i] = -((SWERVE_WHEEL_COUNTS_PER_REVOLUTION*2)-abs((this->raw_usable[i])));
+        }
+	      if((this->raw_usable[i] - this->ANGLE_ENCODERS[i]->GetPosition()) < -SWERVE_WHEEL_COUNTS_PER_REVOLUTION)
+        {
+            this->raw_usable[i] = ((SWERVE_WHEEL_COUNTS_PER_REVOLUTION*2)-abs((this->raw_usable[i])));
         }
         if(use_old)
         {
